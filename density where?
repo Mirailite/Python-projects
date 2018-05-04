@@ -1,0 +1,320 @@
+import pygame
+import sys
+import os
+import random
+import math
+#constants
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+width = 1200
+height = 670
+
+s_width = 20
+s_height = 20
+s_speed = 3
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+YELLOW =(254, 255, 204)
+RED =(255,173,173)
+BLUE = (204, 236, 255)
+# runs the imported module
+pygame.init()
+
+Ship_width = Ship_height = 13
+SIZE = WIDTH, HEIGHT = 1200, 670
+#Text_width = Text_height = width/10
+Text_width = 350
+Text_height = 12
+Text_width_1 = 950
+Text_height_1 = 12
+# set a color for a pill
+Pill_width = 7
+Pill_height = 20
+pygame.init()
+
+#classes
+class Ship(pygame.sprite.Sprite): # give all the powers to the ship class
+    def __init__(self, x, y, side):
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = 3
+        self.image = pygame.Surface((Ship_width, Ship_height)).convert()
+        self.density = Ship_width * Ship_height
+        self.image = pygame.Surface((math.sqrt(self.density),math.sqrt(self.density))).convert()
+     #   self.density = Ship_width * Ship_height
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.type = side
+        self.score = 0
+
+    def move_ship(self):
+        key = pygame.key.get_pressed()
+        if self.type == "left":
+            # movement
+            if key[pygame.K_w]:
+                self.rect.y -= self.speed # move ship in upward direction
+            if key[pygame.K_s]:
+                self.rect.y += self.speed
+            if key[pygame.K_a]:
+                self.rect.x -= self.speed
+            if key[pygame.K_d]:
+                self.rect.x += self.speed
+        if self.type == "right":
+                    # movement
+            if key[pygame.K_UP]:
+                self.rect.y -= self.speed  # move ship in upward direction
+            if key[pygame.K_DOWN]:
+                self.rect.y += self.speed
+            if key[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if key[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+             # boundaries
+    def move_inbounds(self):
+        if self.type == "left":
+            if self.rect.right > WIDTH/2:
+                self.rect.right = WIDTH/2
+            if self.rect.top < HEIGHT/13:
+                self.rect.top = HEIGHT/13
+            if self.rect.bottom > HEIGHT:
+                self.rect.bottom = HEIGHT
+            if self.rect.left < HEIGHT/800:
+                self.rect.left = HEIGHT/800
+
+        if self.type == "right":
+            # boundaries
+            if self.rect.left < WIDTH/2:
+                self.rect.left = WIDTH/2
+            if self.rect.top < HEIGHT / 13:
+                self.rect.top = HEIGHT / 13
+            if self.rect.bottom > HEIGHT:
+                self.rect.bottom = HEIGHT
+            if self.rect.right > WIDTH:
+                self.rect.right = WIDTH
+
+     #   elif self.type == "left":
+     #       pass
+    def update(self, pill_group, rus):
+        self.move_ship()
+        self.move_inbounds()
+        collisions = pygame.sprite.spritecollide(self, pill_group,  True)
+        for pill in collisions:
+            # when the pill touches the ship
+            self.density += pill.density
+            # score when the ship eats the pill
+            if self.type == "left":
+                rus.text_l.image = rus.text_l.font.render("Density: " + str(self.density), 1, BLACK)
+            else:
+                rus.text_r.image = rus.text_r.font.render("Density: " + str(self.density), 1, BLACK)
+         #   if rus.text_l.image > 200 or rus.text_r.image > 200:
+           #         self.play = False
+
+        #print "density" + str(self.density)
+
+
+class Pill(pygame.sprite.Sprite):
+    def __init__(self, pos, density):
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = 3
+        self.density = density # DENSITY VALUE PROBAB;Y TRUE
+        self.image = pygame.Surface((Pill_width, Pill_height)).convert()
+        #self.image.fill(BLUE)
+        self.image.fill(self.set_color())
+#        self.image.fill(self.set_color())
+        self.rect = self.image.get_rect()
+        self.rect = self.rect.move (pos, HEIGHT/ 15)
+        #self.rect = pygame.Rect (pos, -Pill_height, Pill_width,Pill_height)
+
+    def set_color(self):
+        if self.density == 1:
+            return YELLOW
+        elif self.density == 2:
+           return RED
+        elif self.density == 3:
+           return BLUE
+        else:
+      #  elif self.density == 4:
+            return BLACK
+
+
+#PyGame doesn't know anything about your custom color class;
+        # specifically, it expects a tuple of numbers specifying the color, and
+        #  it doesn't know that it needs to call your object's return_color method to get such a tuple.
+# You need to call it yourself.
+
+
+
+    def update(self):
+        # self- objct that's running the object
+# for every pill in every second and fall downward
+# what determines the pill's position at every screen
+      #  self.rect.y += self.speed
+        self.rect = self.rect.move((0,self.speed))
+        if self.rect.y > HEIGHT:
+            self.kill()
+
+
+class Text (pygame.sprite.Sprite):
+    def __init__(self, size, text, xpos, ypos, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.font = pygame.font.SysFont("Arial", size)
+        self.image = self.font.render(text, 1, color)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = xpos
+        self.rect.centery = ypos
+
+
+# what contents
+# increment the score
+# restart the game
+class Game:
+    def __init__(self):
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.clock = pygame.time.Clock()
+
+        self.width = width
+        self.height = height
+        self.image = pygame.Surface((self.width, self.height)).convert()
+        self.rect = pygame.Rect(self.image.get_rect())
+        self.speed = [3,3]
+        self.intro = self.play = self.outro = True
+
+        self.text_l = Text(30, "Density: 0", Text_width,Text_height, BLACK)
+        self.text_r = Text(30, "Density: 0", Text_width_1, Text_height_1,BLACK)
+        self.title = Text(100, "Density", width / 2, height / 4,WHITE)
+        self.title_1 = Text(45, "Click Here", width /2 , height / 2.5,WHITE)
+        self.out_title = Text(25, "Great Match",width/2 ,height / 2,WHITE)
+        self.restart_title = Text(45, "Click Restart",width / 2,height / 4,WHITE)
+
+        self.top_buffer = 50
+        self.vertical = pygame.Surface((1, HEIGHT - self.top_buffer)).convert()
+        self.top_buffer_1 = 50
+        self.horizontal= pygame.Surface((1, HEIGHT/self.top_buffer_1)).convert()
+
+    def blink(self, title_1, title_1_rect):
+         if pygame.time.get_ticks() % 1000 < 500:
+             self.screen.blit(title_1, title_1_rect)
+
+
+
+
+#
+def main():
+
+    # initialize variables
+    global WIDTH, HEIGHT, s_width, s_height, s_speed, WHITE, BLACK, run, play, random, YELLOW, BLUE,RED
+   # size = width, height = 1200,670
+    top_buffer = 50
+    top_buffer_1 = 50
+    fps = 30
+    pygame.display.set_caption("Density")
+    screen = pygame.display.set_mode(SIZE,pygame.SRCALPHA)
+    clock = pygame.time.Clock()
+    rus=Game()
+
+    play = True
+    loop_counter = 0
+
+    horizontal = pygame.Surface((WIDTH + top_buffer_1, 2)).convert()
+    vertical = pygame.Surface((1, HEIGHT - top_buffer)).convert()
+    # text
+#    tes=Text()
+    # create 2 ship objects
+    ship_l= Ship(width/4 -Ship_width/2, height - (4 * Ship_height), "left")
+    ship_r = Ship((width*3)/4 - Ship_width/2, height - (4 * Ship_height), "right")
+
+    # create groups
+    ship_group = pygame.sprite.Group()
+    ship_group.add(ship_l,ship_r)
+    pill_group = pygame.sprite.Group()
+
+    # game play
+    while True:
+        while rus.intro:
+
+        # create game pills in the play
+            for event in pygame.event.get():
+                if event.type ==pygame.QUIT:sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN or pygame.key.get_pressed()[pygame.K_RETURN] != 0:
+                    rus.intro = False
+
+
+            rus.screen.fill(WHITE)
+
+        # blit groups
+            rus.screen.fill(BLACK)
+            rus.screen.blit(rus.title.image, rus.title.rect)
+#        rus.screen.blit(ti, ti_rect)
+            rus.blink(rus.title_1.image, rus.title_1.rect)
+            rus.clock.tick(fps)
+
+            pygame.display.flip()
+        while rus.play:
+            for event in pygame.event.get():
+                if event.type ==pygame.QUIT:sys.exit()
+         #   if event.type == pygame.MOUSEBUTTONDOWN or pygame.key.get_pressed()[pygame.K_RETURN] != 0:
+
+
+            # update groups
+                if loop_counter % 15 == 0:
+                # 60/10
+
+                #print "pill"
+                    pill_l = Pill(random.randrange(0,(WIDTH/2)-Pill_width), int(random.choice("11111111111111111111111111112222222222223333333333333334")))
+                    pill_r = Pill(random.randrange(0, (WIDTH /1.5) - Pill_width),int(random.choice("1111111111111111111111111111122222222223333333333334")))
+                   # pill_r = Pill(random.randrange(WIDTH /1.5), 0 - Pill_width),int(random.choice("1111111111111111111111111111122222222223333333333334"))
+                    pill_group.add(pill_l, pill_r)
+
+                #    pill_r = Pill(random.randrange(0, (WIDTH /1.5) - Pill_width),int(random.choice("1111111111111111111111111111122222222223333333333334")))
+
+            ship_group.update(pill_group, rus)
+       # Ship.score_update(rus
+            pill_group.update()
+
+            # how do i stop the game?
+            if ship_l.density > 170 or ship_r.density > 170:
+                rus.play = False
+
+
+            rus.screen.fill(WHITE)
+        #draws groups
+            ship_group.draw(screen) # each object in the ship group at it's rect on to the screen
+       # screen.blit(ship_r.image, ship_r.rect)
+            pill_group.draw(screen)
+            rus.screen.blit(vertical, (WIDTH/2, top_buffer))
+            rus.screen.blit(horizontal, (0/HEIGHT, top_buffer_1))
+            rus.screen.blit(rus.text_l.image, rus.text_l.rect)
+            rus.screen.blit(rus.text_r.image, rus.text_r.rect)
+        #rus.screen.blit(ti,ti_rect)
+        #rus.screen.blit(ti1,ti1_rect)
+            loop_counter += 2
+            clock.tick(fps)
+        # ship group a bag of variables
+            pygame.display.flip()
+
+
+        while rus.outro:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN or pygame.key.get_pressed()[pygame.K_RETURN] != 0:
+                    rus.outro = False
+
+
+            rus.screen.fill(BLACK)
+
+            rus.screen.blit(rus.out_title.image, rus.out_title.rect)
+            rus.blink(rus.restart_title.image, rus.restart_title.rect)
+            pygame.display.flip()
+
+       # text_group.update()
+        rus.intro = True
+        rus.play = True
+        rus.outro = True
+        ship_l.density = 169
+        ship_r.density = 169
+
+
+
+
+
+if __name__ == "__main__":
+    main()
