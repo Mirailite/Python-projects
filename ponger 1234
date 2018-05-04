@@ -1,0 +1,386 @@
+# using a differnnt control flow
+# which makes the left and the right paddle
+
+import pygame
+import sys
+import time
+
+width = 920
+height = 570
+
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+p_width = 40
+p_height= 150
+p_speed = 3
+class Paddle:
+    def __init__(self, width, height, speed, xpos):
+   # different paddles are place on the x axis
+        self.width = width
+        self.height = height # redundant if it's p_ height
+        self.speed = speed
+        self.image = pygame.Surface((self.width, self.height)).convert()
+        self.image = pygame.image.load("image1/images.jpg").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+   # image is the object for the type surface
+        self.rect =  pygame.Rect(xpos, (self.height / 2  * 2.5 ), self.width,self.height)#- (self.height/2) 2 * 2.5* 2.5
+   # rect holds the x and y
+        self.score = 0
+# create the paddles background image
+
+
+   # rect contains the surface objects of the x and y position does the position
+    # react takes the xpos
+      #self.fill = self.image.fill(WHITE)
+# init method's job is to ceate all the instance variables
+# constructors-What do they do?
+    # 1. they call the base to declare the constructor
+    # 2. they initialize the base pointers
+    # 3. constructors inherirt the functin of the base
+
+# use the instance variable class created
+# problem of self. doin't have the instance variable of the Rect object
+# already in the class# the padlle. widths are not needed would make an irregular of the program
+      #self.fill = self.image.fill(WHITE) # it just creates another self image of an paddle it's not needed cause from the screen
+
+# problem 1 the y axis is bad
+    # problem 2 paddle right  goes to the left side
+
+    def update(self,up, down): # problem 3 update method is a little werid on the sprite movement
+
+        if up:
+            self.rect.y -= self.speed  # sprite would be furthenrn down on the screen
+
+            if self.rect.y - self.speed < 0:  # set to 0
+                #14 < 0
+                self.rect.y = 0
+            self.rect.y = self.rect.y - self.speed
+
+        elif down:
+            self.rect.y = self.rect.y + self.speed
+
+            if self.rect.y + self.speed > height - p_height:  # set to 420 use to be y
+
+                self.rect.y = height - p_height
+# game class- logic of running the game
+class Ball:
+    def __init__(self):
+        self.dim = 40
+        self.speed = [3, 3]
+       # self.image = pygame.Surface((self.dim, self.dim))
+        self.image = pygame.image.load("image1/energy.jpg").convert_alpha() # creates a surface that' transparent are see through
+        self.image = pygame.transform.scale(self.image, (self.dim, self.dim))
+        self.rect = pygame.Rect(width/2, height/2 - (self.dim/ 2), self.dim, self.dim)
+
+    def update(self, lp, rp , score_left, score_right):
+        # contains the logic of how the game plays
+        if self.rect.top <= 0:
+            self.speed = (self.speed[0], -self.speed[1])
+            # bounce of the right paddle
+        if self.rect.bottom >= height:  # y direct inverts
+            self.speed = (self.speed[0], -self.speed[1])
+        if self.rect.bottom >= lp.rect.top and self.rect.top <= lp.rect.bottom and self.rect.left < lp.rect.right + 5 and self.rect.left > lp.rect.right - 5 : #and self.rect.left < lp.rect.right:
+            #self.rect.left < lp.rect.right
+           self.speed = (-self.speed[0], self.speed[1])
+       # if self.rect.right >= rp.rect.left + 5 and self.rect./*right <= rp.rect.left - 5 and self.rect.bottom > rp.rect.left and self.rect.top < rp.rect.left + p_height:
+
+        if self.rect.bottom >= rp.rect.top  and self.rect.top <= rp.rect.bottom and self.rect.right>rp.rect.left - 5 and self.rect.right < rp.rect.left + 5 :#and self.rect.right > rp.rect.left:
+            self.speed =(-self.speed[0], self.speed[1])
+# self- refers the the ball
+            # focus - how does the ball bounct from the paddle
+            # problem with the ball bouncing witht the paddle
+        # if self.rect. right - determines self is the under the ball's class and it tells the the ball's object
+        # also pulls out a bag of the right ball
+   #     if self.rect.right >=  rp.rect.x + 5 and self.rect.left <= rp.rect.x - 5:
+       #     self.speed = (-self.speed[0], self.speed[1])  # tells us that ball_speed is 2, -2\\
+            # we know it' the ball' right because as the ball is increases the so does teh y is increasing
+            # the sub o and one are the index of the ball' speed which is an array
+        #if self.rect.left <= lp.rect.left:
+            #p.rect.left + 5 and self.rect.left <= rp.rect.left - 5 and self.rect.bottom > rp.rect.left and self.rect.top < rp.rect.left + p_height:
+
+            #rp.rect.left + 5 and rp.rect.left <= rp.rect.left - 5 and rp.rect.bottom > rp.rect.left and self.rect.top < rp.rect.left + p_height:
+           # self.speed = (-self.speed[0], self.speed[1]) # tells us that ball_speed is 2, -2\\
+            # we know it' the ball' right because as the ball is increases the so does teh y is increasing
+                # the sub o and one are the index of the ball' speed which is an array
+
+                # bouncing off left paddle
+                # rp.rect.left + 5 and rp.rect.left <= rp.rect.left - 5 and rp.rect.bottom > rp.rect.left
+      #  if self.rect.left <= lp.rect.right + p_width and lp.rect.right >= p_width and lp.rect.bottom > lp.rect.right and self.rect.top < lp.rect.right + p_height:
+        #        self.speed = (-self.speed[0], self.speed[1])
+
+
+
+      # if ball_rect.right >= paddle_right.rect.left + 5 and ball_rect.left <=paddle_right.rect.left - 5 and ball_rect.bottom > paddle_right.rect.left and ball_rect.top < paddle_right.rect.left + p_height:
+               #  ball_speed = (-ball_speed[0], ball_speed[1])
+            # bouncing off left paddle
+            # if ball_rect.left <= paddle_left.rect.right + p_width and ball_rect.right >= p_width and ball_rect.bottom > paddle_left.rect.right and ball_rect.top < paddle_left.rect.right + p_height:
+            #    ball_speed = (-ball_speed[0], ball_speed[1])
+            # needs the paddles width to add it from the x
+        if self.rect.right < 0:
+            lp.score += 1
+            score_left.image = score_left.font.render(str(lp.score), 1, BLACK)
+            self.rect.centerx = width / 2
+            self.rect.centery = height / 2
+            time.sleep(1)
+        elif self.rect.left > width:
+            rp.score += 1
+            score_right.image = score_right.font.render(str(rp.score), 1, BLACK)
+            self.rect.centerx = width / 2
+            self.rect.centery = height / 2
+            time.sleep(1)
+        self.rect = self.rect.move(self.speed)
+            # needs the paddles width to add it from the x pos
+        # Increment the Score
+class Text:
+    def __init__(self, size, text, xpos, ypos):
+        self.font = pygame.font.SysFont("Arial", size)
+        self.image = self.font.render(text, 1, BLACK)
+        self.rect = self.image.get_rect()
+        self.rect = self.rect.move(xpos, ypos)
+class Game:
+    def __init__(self):
+    # what is the game class
+    # score is kept track
+        self.intro = self.play = self.outro = True
+        self.lp_up= False
+        self.rp_up = False
+        self.lp_dpwn = False
+        self.rp_down = False
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((width, height))
+        self.font = pygame.font.SysFont("Arial", 150)
+        self.title = self.font.render("Pong", 1, BLACK)
+        self.title_rect = self.title.get_rect()
+        self.title_rect = self.title_rect.move(width / 2 - self.title_rect.width / 2, height / 2 - self.title_rect.height / 2)
+
+        self.paddle_left = Paddle(p_width, p_height, p_speed, p_width * 2)
+        self.left_score = Text(45, str(self.paddle_left.score), width / 3.5, height / 10)
+        self.paddle_right = Paddle(p_width, p_height, p_speed, width - (40 * 3))
+        self.right_score = Text(45, str(self.paddle_right.score), width / 1.5, height / 10)
+
+        self.width = width
+        self.height = height
+        self.image = pygame.Surface((self.width, self.height)).convert()
+        self.rect = pygame.Rect(self.image.get_rect())
+        self.speed = [5,5]
+
+        self.font_2 = pygame.font.SysFont("Arial", 150)
+        self.out_title = self.font_2.render("Great Match!!", 1, BLACK)
+        self.out_title_rect = self.out_title.get_rect()
+        self.out_title_rect = self.out_title_rect.move(width / 2 - self.out_title_rect.width / 2,height / 4 - self.out_title_rect.height / 2)
+        #self.blink = pygame.time.get_ticks() % 1000 < 500
+#since the instance variables passes through th objects - variables must pass through
+    def update(self,ball, lp, rp, score_left, score_right):
+        if self.rect.right < 0:
+            lp.score += 1
+            score_left.image = score_left.font.render(str(lp.score), 1, BLACK)
+            ball.rect.centerx = width / 2
+            ball.rect.centery = height / 2
+            time.sleep(1)
+        elif self.rect.left > width:
+            rp.score += 1
+            score_right.image = score_right.font.render(str(rp.score), 1, BLACK)
+            ball.rect.centerx = width / 2
+            ball.rect.centery = height / 2
+            time.sleep(1)
+        if lp.score > 2 or rp.score > 2:
+            self.play = False
+        # blink definition function
+    def blink(self,title_1, title_1_rect ):
+        if pygame.time.get_ticks() % 1000 < 500:
+            self.screen.blit(title_1, title_1_rect)
+  #  def restart(self, left_score, right_score):
+      #  if left_score < 10: # if the left score hits on 10 the restart would end which only runs
+     #       sys.exit(0)
+    #    if right_score < 10:
+    #        sys.exit(0)
+
+    pygame.quit()
+#Experiment 4 Fix the conditionals for the ball movement
+def main():
+    pygame.init()
+    global width, height, p_width, p_height, p_speed,WHITE,BLACK, run,play
+# note: affects everything
+    run = Game()
+    # run the intro
+    lp_up = False
+    lp_down = False
+    rp_up = False
+    rp_down = False
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((width, height))
+# title
+    font = pygame.font.SysFont("Arial",150)
+    title = font.render("Pong",1,BLACK)
+    title_rect = title.get_rect()
+    title_rect = title_rect.move(width / 2 - title_rect.width / 2, height / 4 - title_rect.height / 2)
+    # subtitle (self, size, text, xpos, ypos):
+    font_1 = pygame.font.SysFont("Arial", 65)
+    title_1 = font_1.render("Click Here!", 1, BLACK)
+    title_1_rect = title.get_rect()
+    title_1_rect = title_rect.move(width / 2 - title_1_rect.width / 2, height / 1.5)
+# click restart blinking text
+    font_2 = pygame.font.SysFont("Arial", 150)
+    out_title = font_2.render("Great Match!!",1,BLACK)
+    out_title_rect = out_title.get_rect()
+    run.out_title_rect = out_title_rect.move(width / 1 - out_title_rect.width / 1, height / 2 - out_title_rect.height / 1)
+    font_3 = pygame.font.SysFont("Arial", 25)
+    run.restart_title = font_3.render("Click Restart!!", 1, BLACK)
+    run.restart_title_rect = run.restart_title.get_rect()
+    run.restart_title_rect = run.restart_title_rect.move(width / 2 - run.restart_title_rect.width / 2, height / 4 - run.restart_title_rect.height / 1.5)
+
+    # Make a paddle object
+    #paddle_left = Paddle(p_width, p_height, p_speed, p_width * 2)
+  #  left_score = Text(45, str(paddle_left.score), width/3.5, height/10)
+    #left_score= font_1.render("0", 1, BLACK)
+    #left_score_rect = left_score.get_rect()
+    #left_score_rect = left_score_rect.move(width / 3.5 - left_score_rect.width / 2, height / 10)
+# right paddle
+    #paddle_right = Paddle(p_width, p_height, p_speed, width - (40 * 3)) # use to be 3
+    #right_score = Text(45,str(paddle_right.score), width/1.5, height/10)
+    #right_score = font_1.render("0", 1, BLACK)
+    #right_score_rect = right_score.get_rect()
+   # right_score_rect = right_score_rect.move(width / 1.5  - right_score_rect.width / 2, height / 10)
+    print run.paddle_left.score
+    print run.paddle_right.score                                                  # 80
+    #paddle_left =Paddle(40,160,8,40*2 )- another visualization # passes the arguments from the constructor
+    # invoking the constructor  - packaged in a object.
+    # invoking back to the main function
+    #paddle_left = pygame.Surface((p_width, p_height)).convert()
+    #paddle_right  = Paddle(40, 160, 8, width- (40 * 3) - another visualization
+    #paddle_right = pygame.Surface((p_width, p_height)).convert()  # paddle_right.fill(WHITE)
+    #ball
+    ball = Ball()
+    # rect holds all the info of a rectangle meaning everything about th rectangle
+    # lots of variables that tells us the surface
+    # the x and ypos as the first element tupple
+   # intro_back = pygame.image.load("image1/watercolor1.jpg").convert() # no problem it was changing the name of the working directory
+    intro_back = pygame.image.load("image1/watercolor1.jpg").convert()
+    intro_back = pygame.transform.scale(intro_back,(width,height))
+    intro_rect = intro_back.get_rect() #get rect gets the width and height and x and y are defaulted to the 0,0
+    music_intro = pygame.mixer.Sound("sound/easy.ogg")
+    music_intro.play(-1)
+    while True: # game plays the start of the intro until the end
+        while run.intro:
+            music_intro.play()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN or pygame.key.get_pressed()[pygame.K_RETURN] != 0:
+                    run.intro = False # change to True
+                    music_intro.stop()
+            run.screen.fill(WHITE)
+        # screen is local
+            run.screen.blit(intro_back, intro_rect)
+            run.screen.blit(title, title_rect)
+            run.blink(title_1, title_1_rect)
+       # if pygame.time.get_ticks() % 1000 < 500:
+           # screen.blit(title_1, title_1_rect)
+      #  clock.tick(fps)
+            pygame.display.flip()
+
+
+        music_play = pygame.mixer.Sound("sound/blip1.ogg")
+        music_play.play (-1)
+        while run.play:
+        # Read keystrokes
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_w:
+                        lp_up = True
+                    elif event.key == pygame.K_s:
+                        lp_down = True
+
+                    if event.key == pygame.K_UP:
+                        rp_up = True
+                    elif event.key == pygame.K_DOWN:
+                        rp_down = True
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_w:
+                        lp_up = False
+                    elif event.key == pygame.K_s:
+                        lp_down = False
+
+                    if event.key == pygame.K_UP:
+                        rp_up = False
+                    elif event.key == pygame.K_DOWN:
+                        rp_down = False
+        # paddle movement update structure
+        # setting it run. something by moving the other text objects into games as a instance variable
+            run.paddle_left.update(lp_up, lp_down)  # takes exactly five arguemnts three arguents ar given
+            run.paddle_right.update(rp_up, rp_down)
+        # when we pass a variable to a update
+        # Notes on Why?
+        # x pos passese the value of  5
+        # object a collection of variables - points to the memory location of an object
+        # passing the memmory location to the variable x
+        # obj.x.pos go to the memory psition and passes the variable and doesnt' affect the original variable
+            ball.update(run.paddle_left, run.paddle_right,run.left_score , run.right_score)
+        # restart
+            run.update(ball,run.paddle_left, run.paddle_right, run.left_score, run.right_score)
+# important----        # move does not change the ball rect since it's active
+        # Put objects on screen
+        # ball speed is affect ing the if..
+
+            run.screen.fill(WHITE)
+        # blit takes the Surface's top left corner and puts it on the screen at the rect's x and y
+            run.screen.blit(run.paddle_left.image, run.paddle_left.rect)
+            run.screen.blit(run.paddle_right.image, run.paddle_right.rect)
+
+       # screen.blit(left_score, left_score_rect)
+            run.screen.blit(ball.image, ball.rect)
+        # inside of the ball/s rect is the x and the y
+        # the x is the one that' changing the ball' axis
+        # basically, the logic is that the ball is moving in a horizontal way
+
+            run.screen.blit(run.right_score.image, run.right_score.rect)
+      #  if ball.rect.right > height:
+       #     right_score.image = font_1.render(str(paddle_right.score), 1, BLACK)
+
+            run.screen.blit(run.left_score.image, run.left_score.rect)
+        #if ball.rect.left > height:
+            #left_score.image = font_1.render(str(paddle_left.score), 1, BLACK)
+        # blit takes in the first surface of the object an the x and y
+            clock.tick(60)
+            pygame.display.flip()
+
+
+# Move the restart logic into the restart method.
+# Make the ball pause for another second once it is moved to the center of the screen.
+
+
+        outro_last = pygame.image.load("image1/watercolor.jpg").convert()
+        outro_last = pygame.transform.scale(outro_last,(width,height))
+        outro_rect = outro_last.get_rect()
+        music_outro = pygame.mixer.Sound("sound/medium.ogg")
+        music_outro.play(-1)
+        while run.outro:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN or pygame.key.get_pressed()[pygame.K_RETURN] != 0:
+                    run.outro = False
+
+
+            run.screen.fill(WHITE)
+            run.screen.blit(outro_last, outro_rect)
+            run.screen.blit(run.out_title, run.out_title_rect)
+            run.blink(run.restart_title, run.restart_title_rect)
+            pygame.display.flip()
+
+        # paddle and score restart
+        run.paddle_left = Paddle(p_width, p_height, p_speed, p_width * 2)
+        run.left_score = Text(45, str(run.paddle_left.score), width / 3.5, height / 10)
+        run.paddle_right = Paddle(p_width, p_height, p_speed, width - (40 * 3))
+        run.right_score = Text(45, str(run.paddle_right.score), width / 1.5, height / 10)
+        # ball restart
+        run.update(ball, run.paddle_left, run.paddle_right, run.left_score, run.right_score)
+        #intro, play, outro restart
+        run.intro = True
+        run.play = True
+        run.outro = True
+
+if __name__ == "__main__":
+    main()
+
+
